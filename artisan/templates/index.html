@@ -1,0 +1,2405 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>நோமி - கைவினைஞர் டாஷ்போர்டு | NOMII - Artisan Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Latha:wght@400;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #4e54c8;
+            --primary-dark: #363a9e;
+            --secondary: #8f94fb;
+            --accent: #ff7e5f;
+            --accent-dark: #e86a4a;
+            --warning: #ff9966;
+            --success: #4caf50;
+            --dark: #1a1a2e;
+            --darker: #0f0f1c;
+            --light: #f5f5f5;
+            --gray: #e9ecef;
+            --text: #333;
+            --text-light: #666;
+            --card-bg: rgba(255, 255, 255, 0.08);
+            --card-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Latha', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+            color: var(--light);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header Styles */
+        header {
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 0.8rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .logo-icon {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+        }
+
+        .control-btn {
+            position: relative;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 0.7rem 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            color: white;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .control-btn.active {
+            background: rgba(143, 148, 251, 0.2);
+            border-color: var(--secondary);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--accent);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: bold;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        /* Main Layout */
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 1.5rem;
+            padding: 2rem;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: rgba(26, 26, 46, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 1.8rem 1.2rem;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            height: fit-content;
+        }
+
+        .nav-title {
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            color: var(--secondary);
+            margin-bottom: 1.2rem;
+            padding-left: 0.8rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.9rem 1rem;
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.05rem;
+            color: var(--light);
+        }
+
+        .nav-item:hover {
+            background: rgba(143, 148, 251, 0.15);
+        }
+
+        .nav-item.active {
+            background: rgba(143, 148, 251, 0.25);
+            font-weight: 500;
+        }
+
+        .nav-item i {
+            width: 24px;
+            text-align: center;
+            font-size: 1.1rem;
+            color: var(--secondary);
+        }
+
+        /* Dashboard Content */
+        .dashboard-content {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1.5rem;
+        }
+
+        .section {
+            grid-column: span 12;
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1.5rem;
+            display: none;
+        }
+
+        .section.active {
+            display: grid;
+        }
+
+        .welcome-card {
+            grid-column: span 8;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 20px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-card::before {
+            content: "";
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+        }
+
+        .welcome-card h2 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .welcome-card p {
+            font-size: 1.1rem;
+            max-width: 600px;
+            opacity: 0.9;
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+
+        .stats-card {
+            grid-column: span 4;
+            background: rgba(26, 26, 46, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 1.8rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 0.95rem;
+            opacity: 0.8;
+            color: var(--light);
+        }
+
+        .card {
+            background: rgba(26, 26, 46, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 1.8rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: white;
+        }
+
+        .card-title i {
+            color: var(--secondary);
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        .btn {
+            padding: 0.7rem 1.4rem;
+            border-radius: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.95rem;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(78, 84, 200, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--secondary);
+            color: var(--secondary);
+        }
+
+        .btn-outline:hover {
+            background: rgba(143, 148, 251, 0.1);
+        }
+
+        /* Form Styles */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.6rem;
+            font-weight: 500;
+            opacity: 0.9;
+            color: var(--light);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.9rem 1.2rem;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--secondary);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-group .mic-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--accent);
+            transition: all 0.3s ease;
+        }
+
+        .input-group .mic-btn:hover {
+            background: rgba(255, 126, 95, 0.2);
+            color: white;
+        }
+
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 14px;
+            border: 1px solid var(--card-border);
+            background: rgba(15, 15, 28, 0.6);
+        }
+
+        .inventory-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+
+        .inventory-table th {
+            background: rgba(26, 26, 46, 0.8);
+            padding: 1rem 1.5rem;
+            text-align: left;
+            font-weight: 500;
+            font-size: 0.95rem;
+            color: var(--secondary);
+        }
+
+        .inventory-table td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--card-border);
+            color: var(--light);
+        }
+
+        .inventory-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .inventory-table tr:hover {
+            background-color: rgba(143, 148, 251, 0.05);
+        }
+
+        .product-cell {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .product-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .product-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-name {
+            font-weight: 500;
+            margin-bottom: 0.2rem;
+            color: white;
+        }
+
+        .product-category {
+            font-size: 0.85rem;
+            opacity: 0.7;
+        }
+
+        .stock-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .stock-low {
+            background: rgba(255, 153, 102, 0.2);
+            color: var(--warning);
+        }
+
+        .stock-medium {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+
+        .stock-high {
+            background: rgba(76, 175, 80, 0.2);
+            color: var(--success);
+        }
+
+        .action-cell {
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid var(--card-border);
+            color: var(--light);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .edit-btn:hover {
+            background: rgba(78, 84, 200, 0.3);
+            color: var(--secondary);
+            border-color: var(--secondary);
+        }
+
+        .delete-btn:hover {
+            background: rgba(255, 126, 95, 0.3);
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        /* Charts */
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+
+        /* Insights Cards */
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .insight-card {
+            background: rgba(26, 26, 46, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .insight-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .insight-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .insight-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .warning .insight-icon {
+            background: rgba(255, 153, 102, 0.2);
+            color: var(--warning);
+        }
+
+        .success .insight-icon {
+            background: rgba(76, 175, 80, 0.2);
+            color: var(--success);
+        }
+
+        .info .insight-icon {
+            background: rgba(78, 84, 200, 0.2);
+            color: var(--secondary);
+        }
+
+        .insight-title {
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .insight-content {
+            line-height: 1.7;
+            opacity: 0.9;
+            color: var(--light);
+        }
+
+        .insight-actions {
+            margin-top: 1.2rem;
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        /* Voice Assistant */
+        .voice-assistant {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 200;
+        }
+
+        .voice-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.8rem;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(255, 126, 95, 0.4);
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .voice-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(255, 126, 95, 0.5);
+        }
+
+        .voice-btn.listening {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 126, 95, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(255, 126, 95, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 126, 95, 0); }
+        }
+
+        .voice-panel {
+            position: absolute;
+            bottom: 90px;
+            right: 0;
+            width: 350px;
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            display: none;
+        }
+
+        .voice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+        }
+
+        .voice-title {
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: white;
+        }
+
+        .voice-close {
+            background: none;
+            border: none;
+            color: var(--light);
+            font-size: 1.2rem;
+            cursor: pointer;
+            opacity: 0.7;
+        }
+
+        .voice-status {
+            background: rgba(255, 255, 255, 0.07);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            margin-bottom: 1.2rem;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-style: italic;
+            color: var(--light);
+        }
+
+        .voice-commands {
+            margin-top: 1.5rem;
+        }
+
+        .commands-title {
+            font-size: 1rem;
+            margin-bottom: 0.8rem;
+            opacity: 0.8;
+            color: var(--light);
+        }
+
+        .command-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.7rem 0;
+            border-bottom: 1px solid var(--card-border);
+            color: var(--light);
+        }
+
+        .command-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(78, 84, 200, 0.9);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            opacity: 0;
+            transition: opacity 0.3s, bottom 0.3s;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            bottom: 40px;
+            opacity: 1;
+        }
+
+        .toast.error {
+            background: rgba(255, 126, 95, 0.9);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: rgba(26, 26, 46, 0.95);
+            border-radius: 20px;
+            width: 500px;
+            max-width: 90%;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        /* Settings Preferences */
+        .preference-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .preference-info {
+            flex: 1;
+        }
+
+        .preference-info h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .preference-info p {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        /* Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: .4s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+        }
+
+        input:checked + .slider {
+            background-color: var(--success);
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px var(--success);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .slider.round {
+            border-radius: 34px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .welcome-card {
+                grid-column: span 12;
+            }
+            
+            .stats-card {
+                grid-column: span 12;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            
+            .header-controls {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .dashboard-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .card {
+                grid-column: span 12;
+            }
+            
+            .voice-panel {
+                width: 300px;
+                right: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fas fa-hands"></i>
+            </div>
+            <div class="logo-text">நோமி</div>
+        </div>
+        
+        <div class="header-controls">
+            <div class="control-btn" id="sync-btn">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <span id="sync-text">Sync Data</span>
+            </div>
+            <div class="control-btn" id="lang-toggle-btn">
+                <i class="fas fa-language"></i>
+                <span id="lang-text">தமிழ்</span>
+            </div>
+            <div class="control-btn" id="notifications-btn">
+                <i class="fas fa-bell"></i>
+                <span id="notifications-text">Notifications</span>
+                <div class="notification-badge">5</div>
+            </div>
+            <div class="user-avatar">த</div>
+        </div>
+    </header>
+    
+    <!-- Main Dashboard -->
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <div class="nav-title" id="main-menu-text">Main Menu</div>
+            <div class="nav-item active" data-section="dashboard">
+                <i class="fas fa-home"></i>
+                <span id="dashboard-text">Dashboard</span>
+            </div>
+            <div class="nav-item" data-section="materials">
+                <i class="fas fa-boxes"></i>
+                <span id="materials-text">Materials</span>
+            </div>
+            <div class="nav-item" data-section="analysis">
+                <i class="fas fa-chart-line"></i>
+                <span id="analysis-text">Analysis</span>
+            </div>
+            <div class="nav-item" data-section="insights">
+                <i class="fas fa-lightbulb"></i>
+                <span id="insights-menu-text">AI Insights</span>
+            </div>
+            <div class="nav-item" data-section="settings">
+                <i class="fas fa-cog"></i>
+                <span id="settings-text">Settings</span>
+            </div>
+            
+            <div class="nav-title" style="margin-top: 2rem;" id="quick-actions-text">Quick Actions</div>
+            <div class="nav-item" id="add-product-action">
+                <i class="fas fa-plus-circle"></i>
+                <span id="add-product-action-text">Add Product</span>
+            </div>
+            <div class="nav-item" id="export-data-action">
+                <i class="fas fa-file-export"></i>
+                <span id="export-text">Export Data</span>
+            </div>
+            <div class="nav-item" id="help-center-action">
+                <i class="fas fa-question-circle"></i>
+                <span id="help-text">Help Center</span>
+            </div>
+        </div>
+        
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">
+            <!-- Dashboard Section (Default) -->
+            <div id="dashboard-section" class="section active">
+                <!-- Welcome Card -->
+                <div class="welcome-card">
+                    <h2 id="welcome-title">வரவேற்கிறோம், தமிழன்!</h2>
+                    <p id="welcome-text">உங்கள் கைவினைப் பொருட்களை நிர்வகிக்க இந்த ஸ்மார்ட் டாஷ்போர்டு உதவும். குரல் உள்ளீடு, AI பரிந்துரைகள் மற்றும் எளிய நிர்வாகம் ஆகியவற்றைப் பயன்படுத்தி உங்கள் வணிகத்தை வளர்க்கவும்.</p>
+                    <button class="btn btn-primary" id="guide-btn">
+                        <i class="fas fa-play-circle"></i>
+                        <span id="guide-text">வழிகாட்டி வீடியோவைப் பார்க்கவும்</span>
+                    </button>
+                </div>
+                
+                <!-- Stats Card -->
+                <div class="stats-card">
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="total-products">0</div>
+                            <div class="stat-label" id="total-products-label">மொத்த பொருட்கள்</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="total-revenue">₹0</div>
+                            <div class="stat-label" id="revenue-label">மாத வருவாய்</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="sales-rate">0%</div>
+                            <div class="stat-label" id="sales-rate-label">விற்பனை விகிதம்</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="new-orders">0</div>
+                            <div class="stat-label" id="orders-label">புதிய ஆர்டர்கள்</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Products Section -->
+                <div class="card" style="grid-column: span 8;">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-box-open"></i>
+                            <span id="products-title">உங்கள் பொருட்கள்</span>
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn btn-outline" id="filter-btn">
+                                <i class="fas fa-filter"></i>
+                                <span id="filter-text">வடிகட்டு</span>
+                            </button>
+                            <button class="btn btn-primary" id="add-product-btn">
+                                <i class="fas fa-plus"></i>
+                                <span id="add-product-text">புதிய பொருள்</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table class="inventory-table">
+                            <thead>
+                                <tr>
+                                    <th id="col-product">பொருள்</th>
+                                    <th id="col-category">வகை</th>
+                                    <th id="col-quantity">அளவு</th>
+                                    <th id="col-price">விலை</th>
+                                    <th id="col-status">நிலை</th>
+                                    <th id="col-actions">செயல்கள்</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventory-body">
+                                <!-- Products will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- AI Insights Section -->
+                <div class="card" style="grid-column: span 4;">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-lightbulb"></i>
+                            <span id="insights-title">AI பரிந்துரைகள்</span>
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn btn-outline" id="refresh-insights">
+                                <i class="fas fa-sync"></i>
+                                <span id="refresh-text">புதுப்பி</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="insights-grid" id="insights-container">
+                        <!-- Insights will be populated here -->
+                    </div>
+                </div>
+                
+                <!-- Sales Chart -->
+                <div class="card" style="grid-column: span 6;">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-chart-bar"></i>
+                            <span id="sales-title">விற்பனை பகுப்பாய்வு</span>
+                        </div>
+                        <div class="card-actions">
+                            <select class="form-control" id="chart-range" style="width: 150px;">
+                                <option value="7" id="7-days">கடந்த 7 நாட்கள்</option>
+                                <option value="30" id="30-days">கடந்த 30 நாட்கள்</option>
+                                <option value="90" selected id="90-days">கடந்த 90 நாட்கள்</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <canvas id="salesChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Category Distribution -->
+                <div class="card" style="grid-column: span 6;">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-pie-chart"></i>
+                            <span id="category-title">வகை வாரியான விற்பனை</span>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Materials Section -->
+            <div id="materials-section" class="section">
+                <div class="card" style="grid-column: span 12;">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-boxes"></i>
+                            <span id="materials-title">Materials Inventory</span>
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn btn-primary" id="add-material-btn">
+                                <i class="fas fa-plus"></i>
+                                <span id="add-material-text">Add Material</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table class="inventory-table">
+                            <thead>
+                                <tr>
+                                    <th>Material</th>
+                                    <th>Type</th>
+                                    <th>Quantity</th>
+                                    <th>Unit Cost</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="materials-body">
+                                <tr>
+                                    <td>Silk Thread</td>
+                                    <td>Textile</td>
+                                    <td>25 kg</td>
+                                    <td>₹850/kg</td>
+                                    <td><span class="stock-badge stock-high">Sufficient</span></td>
+                                    <td>
+                                        <div class="action-cell">
+                                            <div class="action-btn edit-btn"><i class="fas fa-edit"></i></div>
+                                            <div class="action-btn delete-btn"><i class="fas fa-trash"></i></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Brass Sheets</td>
+                                    <td>Metal</td>
+                                    <td>8 kg</td>
+                                    <td>₹1200/kg</td>
+                                    <td><span class="stock-badge stock-medium">Medium</span></td>
+                                    <td>
+                                        <div class="action-cell">
+                                            <div class="action-btn edit-btn"><i class="fas fa-edit"></i></div>
+                                            <div class="action-btn delete-btn"><i class="fas fa-trash"></i></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Terracotta Clay</td>
+                                    <td>Clay</td>
+                                    <td>40 kg</td>
+                                    <td>₹150/kg</td>
+                                    <td><span class="stock-badge stock-high">Sufficient</span></td>
+                                    <td>
+                                        <div class="action-cell">
+                                            <div class="action-btn edit-btn"><i class="fas fa-edit"></i></div>
+                                            <div class="action-btn delete-btn"><i class="fas fa-trash"></i></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Analysis Section -->
+            <div id="analysis-section" class="section">
+                <div class="card" style="grid-column: span 6;">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Sales Trends</span>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="card" style="grid-column: span 6;">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-chart-pie"></i>
+                            <span>Revenue by Category</span>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="card" style="grid-column: span 12;">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-table"></i>
+                            <span>Performance Metrics</span>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="inventory-table">
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Current Month</th>
+                                    <th>Previous Month</th>
+                                    <th>Change</th>
+                                    <th>Target</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Total Revenue</td>
+                                    <td>₹1,25,000</td>
+                                    <td>₹98,500</td>
+                                    <td><span class="stock-badge stock-high">+26.9%</span></td>
+                                    <td>₹1,00,000</td>
+                                </tr>
+                                <tr>
+                                    <td>Products Sold</td>
+                                    <td>142</td>
+                                    <td>115</td>
+                                    <td><span class="stock-badge stock-high">+23.5%</span></td>
+                                    <td>120</td>
+                                </tr>
+                                <tr>
+                                    <td>New Customers</td>
+                                    <td>38</td>
+                                    <td>42</td>
+                                    <td><span class="stock-badge stock-low">-9.5%</span></td>
+                                    <td>45</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- AI Insights Section -->
+            <div id="insights-section" class="section">
+                <div class="card" style="grid-column: span 12;">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-lightbulb"></i>
+                            <span id="ai-insights-title">AI Insights & Recommendations</span>
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn btn-outline" id="refresh-ai-insights">
+                                <i class="fas fa-sync"></i>
+                                <span>Refresh Insights</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="insights-grid" id="ai-insights-container">
+                        <!-- AI Insights will be populated here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Settings Section -->
+            <div id="settings-section" class="section">
+                <div class="card" style="grid-column: span 6;">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-user-cog"></i>
+                            <span>Profile Settings</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form>
+                            <div class="form-group">
+                                <label>Name</label>
+                                <input type="text" class="form-control" value="Tamil Artisan">
+                            </div>
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" class="form-control" value="artisan@nomii.in">
+                            </div>
+                            <div class="form-group">
+                                <label>Language</label>
+                                <select class="form-control">
+                                    <option>Tamil</option>
+                                    <option>English</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-primary">Update Profile</button>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="card" style="grid-column: span 6;">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Security</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form>
+                            <div class="form-group">
+                                <label>Current Password</label>
+                                <input type="password" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label>New Password</label>
+                                <input type="password" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label>Confirm Password</label>
+                                <input type="password" class="form-control">
+                            </div>
+                            <button class="btn btn-primary">Change Password</button>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="card" style="grid-column: span 12;">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-sliders-h"></i>
+                            <span>Preferences</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="preference-item">
+                            <div class="preference-info">
+                                <h4>Voice Assistant</h4>
+                                <p>Enable voice commands for hands-free operation</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <div class="preference-item">
+                            <div class="preference-info">
+                                <h4>Auto Backup</h4>
+                                <p>Automatically backup data to cloud every day</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <div class="preference-item">
+                            <div class="preference-info">
+                                <h4>Low Stock Alerts</h4>
+                                <p>Receive notifications when stock is low</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Product Modal -->
+    <div class="modal" id="add-product-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">புதிய பொருளைச் சேர்க்கவும்</h3>
+                <button class="modal-close" id="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="voice-status" id="voice-status">மைக்ரோஃபோன் தயார்</div>
+                <form id="product-form">
+                    <div class="form-group">
+                        <label for="product-name" id="name-label">பொருளின் பெயர்</label>
+                        <div class="input-group">
+                            <input type="text" id="product-name" class="form-control" required>
+                            <button type="button" class="mic-btn" data-for="product-name">
+                                <i class="fas fa-microphone"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="quantity" id="qty-label">அளவு</label>
+                        <div class="input-group">
+                            <input type="number" id="quantity" class="form-control" min="1" value="1" required>
+                            <button type="button" class="mic-btn" data-for="quantity">
+                                <i class="fas fa-microphone"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="price" id="price-label">விலை (₹)</label>
+                        <div class="input-group">
+                            <input type="number" id="price" class="form-control" min="10" required>
+                            <button type="button" class="mic-btn" data-for="price">
+                                <i class="fas fa-microphone"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        <i class="fas fa-save"></i>
+                        <span id="save-text">சேமிக்கவும்</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Voice Assistant -->
+    <div class="voice-assistant">
+        <button class="voice-btn" id="voice-btn">
+            <i class="fas fa-microphone"></i>
+        </button>
+        
+        <div class="voice-panel" id="voice-panel">
+            <div class="voice-header">
+                <div class="voice-title" id="voice-panel-title">குரை உதவியாளர்</div>
+                <button class="voice-close" id="voice-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="voice-status" id="voice-panel-status">
+                குரல் உள்ளீட்டிற்காக காத்திருக்கிறது...
+            </div>
+            
+            <button class="btn btn-primary" style="width: 100%;" id="start-listen">
+                <i class="fas fa-microphone"></i>
+                <span id="start-listen-text">கேட்கத் தொடங்கு</span>
+            </button>
+            
+            <div class="voice-commands">
+                <div class="commands-title" id="commands-title">எடுத்துக்காட்டு கட்டளைகள்:</div>
+                
+                <div class="command-item">
+                    <i class="fas fa-arrow-right"></i>
+                    <span id="command1">"புதிய பொருள் சேர்"</span>
+                </div>
+                
+                <div class="command-item">
+                    <i class="fas fa-arrow-right"></i>
+                    <span id="command2">"தஞ்சாவூர் பிளேட் ஐந்து 1200 ரூபாய்"</span>
+                </div>
+                
+                <div class="command-item">
+                    <i class="fas fa-arrow-right"></i>
+                    <span id="command3">"குறைந்த சரக்கு காட்டு"</span>
+                </div>
+                
+                <div class="command-item">
+                    <i class="fas fa-arrow-right"></i>
+                    <span id="command4">"விற்பனை அறிக்கை திற"</span>
+                </div>
+
+                <div class="command-item">
+                    <i class="fas fa-arrow-right"></i>
+                    <span id="command5">"பொருட்கள் பிரிவுக்கு செல்"</span>
+                </div>
+
+                <div class="command-item">
+                    <i class="fas fa-arrow-right"></i>
+                    <span id="command6">"ஆய்வு அறிக்கை காட்டு"</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Global state
+        let currentLang = localStorage.getItem('artisanLang') || 'TA';
+        let isListening = false;
+        let recognition = null;
+        let products = [];
+        let userID = 'NOMII-A-' + Math.floor(1000 + Math.random() * 9000);
+        let currentField = null;
+
+        // DOM Elements
+        const langToggleBtn = document.getElementById('lang-toggle-btn');
+        const micBtn = document.getElementById('voice-btn');
+        const voiceStatus = document.getElementById('voice-status');
+        const productForm = document.getElementById('product-form');
+        const inventoryTable = document.getElementById('inventory-body');
+        const insightsContainer = document.getElementById('insights-container');
+        const exportBtn = document.getElementById('export-data-action');
+        const addProductBtn = document.getElementById('add-product-btn');
+        const addProductModal = document.getElementById('add-product-modal');
+        const closeModal = document.getElementById('close-modal');
+        const voicePanel = document.getElementById('voice-panel');
+        const voiceClose = document.getElementById('voice-close');
+        const startListen = document.getElementById('start-listen');
+        const navItems = document.querySelectorAll('.nav-item');
+
+        // Initialize the dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set user ID
+            document.querySelector('.user-avatar').textContent = userID.charAt(0);
+            
+            // Initialize language
+            updateLanguage(currentLang);
+            
+            // Initialize Speech Recognition
+            initSpeechRecognition();
+            
+            // Load initial data
+            fetchProducts();
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Initialize charts
+            initializeCharts();
+            
+            // Setup navigation
+            setupNavigation();
+        });
+
+        // Initialize Speech Recognition
+        function initSpeechRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            
+            if (!SpeechRecognition) {
+                document.getElementById('voice-status').textContent = currentLang === 'TA' ? 
+                    'உங்கள் உலாவி குரை அங்கீகரிப்பதை ஆதரிக்கவில்லை' : 
+                    'Your browser does not support speech recognition';
+                return;
+            }
+            
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 3;
+            
+            recognition.onstart = () => {
+                isListening = true;
+                micBtn.classList.add('listening');
+                voiceStatus.textContent = currentLang === 'TA' ? 
+                    'கேட்கிறது... பேசுங்கள்' : 
+                    'Listening... Speak now';
+            };
+            
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                processVoiceInput(transcript);
+            };
+            
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                voiceStatus.textContent = currentLang === 'TA' ? 
+                    'பிழை: ' + event.error : 
+                    'Error: ' + event.error;
+                stopListening();
+            };
+            
+            recognition.onend = () => {
+                stopListening();
+            };
+        }
+
+        // Stop listening and update UI
+        function stopListening() {
+            isListening = false;
+            micBtn.classList.remove('listening');
+            if (currentField) {
+                currentField = null;
+            }
+        }
+
+        // Toggle Voice Input
+        function toggleVoiceInput() {
+            if (isListening) {
+                recognition.stop();
+            } else {
+                recognition.lang = currentLang === 'TA' ? 'ta-IN' : 'en-US';
+                recognition.start();
+            }
+        }
+
+        // Process Voice Input
+        function processVoiceInput(transcript) {
+            console.log('Voice input:', transcript);
+            
+            // If specific field is targeted
+            if (currentField) {
+                switch(currentField) {
+                    case 'product-name':
+                        document.getElementById('product-name').value = transcript;
+                        break;
+                    case 'quantity':
+                        document.getElementById('quantity').value = extractQuantity(transcript, currentLang);
+                        break;
+                    case 'price':
+                        document.getElementById('price').value = extractPrice(transcript, currentLang);
+                        break;
+                }
+                currentField = null;
+                return;
+            }
+            
+            // Update status to show recognized command
+            voiceStatus.textContent = currentLang === 'TA' ? 
+                `அங்கீகரிக்கப்பட்டது: "${transcript}"` : 
+                `Recognized: "${transcript}"`;
+            
+            // Process complex commands through backend
+            fetch('/voice_command', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    transcript: transcript, 
+                    lang: currentLang 
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.action === 'add_product') {
+                    // Fill the form with product details
+                    document.getElementById('product-name').value = data.product_name;
+                    document.getElementById('quantity').value = data.quantity;
+                    document.getElementById('price').value = data.price;
+                    
+                    // Auto-submit after delay
+                    setTimeout(() => {
+                        productForm.dispatchEvent(new Event('submit'));
+                    }, 1500);
+                }
+                else if (data.action === 'open_add_product') {
+                    setTimeout(() => {
+                        addProductBtn.click();
+                        showToast(currentLang === 'TA' ? 'புதிய பொருள் பிரிவு திறக்கப்பட்டது' : 'Add product section opened');
+                    }, 1000);
+                }
+                else if (data.action === 'filter_low_stock') {
+                    filterLowStock();
+                    showToast(currentLang === 'TA' ? 'குறைந்த சரக்கு பொருட்கள் காட்டப்படுகின்றன' : 'Showing low stock items');
+                }
+                else if (data.action === 'open_sales_report') {
+                    showSection('analysis');
+                    showToast(currentLang === 'TA' ? 'விற்பனை பகுப்பாய்வு திறக்கப்பட்டது' : 'Sales analytics opened');
+                }
+                else if (data.action === 'navigate_materials') {
+                    showSection('materials');
+                    showToast(currentLang === 'TA' ? 'பொருட்கள் பிரிவுக்கு மாற்றப்பட்டது' : 'Switched to materials section');
+                }
+                else if (data.action === 'open_analysis') {
+                    showSection('analysis');
+                    showToast(currentLang === 'TA' ? 'ஆய்வு அறிக்கை காட்டப்படுகிறது' : 'Showing analysis report');
+                }
+                else if (data.action === 'open_dashboard') {
+                    showSection('dashboard');
+                    showToast(currentLang === 'TA' ? 'டாஷ்போர்டு காட்டப்படுகிறது' : 'Showing dashboard');
+                }
+                else if (data.action === 'open_insights') {
+                    showSection('insights');
+                    showToast(currentLang === 'TA' ? 'AI பரிந்துரைகள் காட்டப்படுகின்றன' : 'Showing AI insights');
+                }
+                else if (data.action === 'open_settings') {
+                    showSection('settings');
+                    showToast(currentLang === 'TA' ? 'அமைப்புகள் பிரிவு திறக்கப்பட்டது' : 'Settings section opened');
+                }
+                else {
+                    voiceStatus.textContent = currentLang === 'TA' ? 
+                        `கட்டளையை அங்கீகரிக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்` : 
+                        `Command not recognized. Please try again`;
+                }
+            })
+            .catch(error => {
+                console.error('Error processing voice command:', error);
+                voiceStatus.textContent = currentLang === 'TA' ? 
+                    'கட்டளை செயலாக்கத்தில் பிழை' : 
+                    'Error processing command';
+            });
+        }
+
+        // Tamil number words to digits mapping
+        const tamilNumbers = {
+            'ஒன்று': 1, 'இரண்டு': 2, 'மூன்று': 3, 'நான்கு': 4, 'ஐந்து': 5,
+            'ஆறு': 6, 'ஏழு': 7, 'எட்டு': 8, 'ஒன்பது': 9, 'பத்து': 10,
+            'பதினொன்று': 11, 'பன்னிரண்டு': 12, 'பதிமூன்று': 13, 'பதினான்கு': 14, 'பதினைந்து': 15,
+            'பதினாறு': 16, 'பதினேழு': 17, 'பதினெட்டு': 18, 'பத்தொன்பது': 19, 'இருபது': 20,
+            'இருபத்தி ஒன்று': 21, 'இருபத்தி இரண்டு': 22, 'முப்பது': 30, 'நாற்பது': 40, 'ஐம்பது': 50,
+            'அறுபது': 60, 'எழுபது': 70, 'எண்பது': 80, 'தொண்ணூறு': 90, 'நூறு': 100,
+            'இருநூறு': 200, 'முன்னூறு': 300, 'நாநூறு': 400, 'ஐநூறு': 500, 'ஆறுநூறு': 600,
+            'எழுநூறு': 700, 'எண்ணூறு': 800, 'தொள்ளாயிரம்': 900, 'ஆயிரம்': 1000
+        };
+
+        // Extract quantity from input text
+        function extractQuantity(input, lang) {
+            if (lang === 'TA') {
+                // Check for Tamil number words
+                for (const [word, num] of Object.entries(tamilNumbers)) {
+                    if (input.includes(word)) {
+                        return num;
+                    }
+                }
+            }
+            
+            // Look for digits
+            const numbers = input.match(/\d+/g) || [];
+            return numbers.length > 0 ? parseInt(numbers[0]) : 1;
+        }
+
+        // Extract price from input text
+        function extractPrice(input, lang) {
+            if (lang === 'TA') {
+                // Check for Tamil number words with currency context
+                for (const [word, num] of Object.entries(tamilNumbers)) {
+                    if (input.includes(word) && (input.includes('ரூபாய்') || input.includes('ரூ'))) {
+                        return num;
+                    }
+                }
+            }
+            
+            // Look for currency patterns
+            const matches = input.match(/(\d+)\s*(ரூபாய்|ரூ|rupees?|rs|₹)/i) || input.match(/\d+/g) || [];
+            return matches.length > 0 ? parseInt(matches[0]) : 1000;
+        }
+
+        // Filter low stock items
+        function filterLowStock() {
+            const lowStockProducts = products.filter(p => p.quantity < 5);
+            products = lowStockProducts;
+            renderInventory();
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Language toggle
+            langToggleBtn.addEventListener('click', toggleLanguage);
+            
+            // Voice button
+            micBtn.addEventListener('click', toggleVoiceInput);
+            
+            // Add product button
+            addProductBtn.addEventListener('click', () => {
+                addProductModal.style.display = 'flex';
+            });
+            
+            // Close modal button
+            closeModal.addEventListener('click', () => {
+                addProductModal.style.display = 'none';
+            });
+            
+            // Form submission
+            productForm.addEventListener('submit', addProduct);
+            
+            // Mic buttons for specific fields
+            document.querySelectorAll('.mic-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const field = e.target.closest('.mic-btn').getAttribute('data-for');
+                    currentField = field;
+                    recognition.lang = currentLang === 'TA' ? 'ta-IN' : 'en-US';
+                    recognition.start();
+                });
+            });
+            
+            // Voice panel
+            micBtn.addEventListener('click', () => {
+                voicePanel.style.display = voicePanel.style.display === 'block' ? 'none' : 'block';
+            });
+            
+            voiceClose.addEventListener('click', () => {
+                voicePanel.style.display = 'none';
+            });
+            
+            startListen.addEventListener('click', toggleVoiceInput);
+            
+            // Export button
+            exportBtn.addEventListener('click', () => {
+                window.location.href = '/download_excel';
+            });
+        }
+
+        // Setup navigation
+        function setupNavigation() {
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // Remove active class from all items
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    
+                    // Add active class to clicked item
+                    this.classList.add('active');
+                    
+                    // Get section to show
+                    const section = this.getAttribute('data-section');
+                    showSection(section);
+                });
+            });
+        }
+
+        // Show specific section
+        function showSection(section) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(sec => {
+                sec.classList.remove('active');
+            });
+            
+            // Show requested section
+            document.getElementById(`${section}-section`).classList.add('active');
+        }
+
+        // Toggle language
+        function toggleLanguage() {
+            currentLang = currentLang === 'TA' ? 'EN' : 'TA';
+            localStorage.setItem('artisanLang', currentLang);
+            updateLanguage(currentLang);
+            fetchProducts();
+        }
+
+        // Update UI Language
+        function updateLanguage(lang) {
+            // Update UI text elements
+            const elements = {
+                'welcome-title': lang === 'TA' ? 'வரவேற்கிறோம், தமிழன்!' : 'Welcome, Artisan!',
+                'welcome-text': lang === 'TA' ? 'உங்கள் கைவினைப் பொருட்களை நிர்வகிக்க இந்த ஸ்மார்ட் டாஷ்போர்டு உதவும். குரல் உள்ளீடு, AI பரிந்துரைகள் மற்றும் எளிய நிர்வாகம் ஆகியவற்றைப் பயன்படுத்தி உங்கள் வணிகத்தை வளர்க்கவும்.' : 'This smart dashboard helps you manage your handicraft products. Use voice input, AI suggestions, and simple management to grow your business.',
+                'guide-text': lang === 'TA' ? 'வழிகாட்டி வீடியோவைப் பார்க்கவும்' : 'View Guide Video',
+                'products-title': lang === 'TA' ? 'உங்கள் பொருட்கள்' : 'Your Products',
+                'insights-title': lang === 'TA' ? 'AI பரிந்துரைகள்' : 'AI Insights',
+                'sales-title': lang === 'TA' ? 'விற்பனை பகுப்பாய்வு' : 'Sales Analytics',
+                'category-title': lang === 'TA' ? 'வகை வாரியான விற்பனை' : 'Category Sales',
+                'add-product-text': lang === 'TA' ? 'புதிய பொருள்' : 'New Product',
+                'filter-text': lang === 'TA' ? 'வடிகட்டு' : 'Filter',
+                'refresh-text': lang === 'TA' ? 'புதுப்பி' : 'Refresh',
+                'modal-title': lang === 'TA' ? 'புதிய பொருளைச் சேர்க்கவும்' : 'Add New Product',
+                'name-label': lang === 'TA' ? 'பொருளின் பெயர்' : 'Product Name',
+                'qty-label': lang === 'TA' ? 'அளவு' : 'Quantity',
+                'price-label': lang === 'TA' ? 'விலை (₹)' : 'Price (₹)',
+                'save-text': lang === 'TA' ? 'சேமிக்கவும்' : 'Save Product',
+                'voice-panel-title': lang === 'TA' ? 'குரை உதவியாளர்' : 'Voice Assistant',
+                'start-listen-text': lang === 'TA' ? 'கேட்கத் தொடங்கு' : 'Start Listening',
+                'commands-title': lang === 'TA' ? 'எடுத்துக்காட்டு கட்டளைகள்:' : 'Example Commands:',
+                'sync-text': lang === 'TA' ? 'டேட்டாவை ஒத்திசைக்கவும்' : 'Sync Data',
+                'lang-text': lang === 'TA' ? 'தமிழ்' : 'English',
+                'notifications-text': lang === 'TA' ? 'அறிவிப்புகள்' : 'Notifications',
+                'main-menu-text': lang === 'TA' ? 'முதன்மை பட்டி' : 'Main Menu',
+                'dashboard-text': lang === 'TA' ? 'டாஷ்போர்டு' : 'Dashboard',
+                'materials-text': lang === 'TA' ? 'பொருட்கள்' : 'Materials',
+                'analysis-text': lang === 'TA' ? 'ஆய்வு' : 'Analysis',
+                'insights-menu-text': lang === 'TA' ? 'AI பரிந்துரைகள்' : 'AI Insights',
+                'settings-text': lang === 'TA' ? 'அமைப்புகள்' : 'Settings',
+                'quick-actions-text': lang === 'TA' ? 'விரைவு செயல்கள்' : 'Quick Actions',
+                'add-product-action-text': lang === 'TA' ? 'புதிய பொருள் சேர்' : 'Add Product',
+                'export-text': lang === 'TA' ? 'டேட்டாவை ஏற்றுமதி செய்க' : 'Export Data',
+                'help-text': lang === 'TA' ? 'உதவி மையம்' : 'Help Center',
+                'command1': lang === 'TA' ? '"புதிய பொருள் சேர்"' : '"add new product"',
+                'command2': lang === 'TA' ? '"தஞ்சாவூர் பிளேட் ஐந்து 1200 ரூபாய்"' : '"Thanjavur plate five 1200 rupees"',
+                'command3': lang === 'TA' ? '"குறைந்த சரக்கு காட்டு"' : '"show low stock"',
+                'command4': lang === 'TA' ? '"விற்பனை அறிக்கை திற"' : '"open sales report"',
+                'command5': lang === 'TA' ? '"பொருட்கள் பிரிவுக்கு செல்"' : '"go to materials"',
+                'command6': lang === 'TA' ? '"ஆய்வு அறிக்கை காட்டு"' : '"show analysis report"',
+                '7-days': lang === 'TA' ? 'கடந்த 7 நாட்கள்' : 'Last 7 Days',
+                '30-days': lang === 'TA' ? 'கடந்த 30 நாட்கள்' : 'Last 30 Days',
+                '90-days': lang === 'TA' ? 'கடந்த 90 நாட்கள்' : 'Last 90 Days',
+                'materials-title': lang === 'TA' ? 'பொருட்கள் சரக்கு' : 'Materials Inventory',
+                'add-material-text': lang === 'TA' ? 'புதிய பொருள் சேர்' : 'Add Material',
+                'ai-insights-title': lang === 'TA' ? 'AI பரிந்துரைகள்' : 'AI Insights & Recommendations'
+            };
+            
+            Object.keys(elements).forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = elements[id];
+                }
+            });
+            
+            // Update stats labels
+            document.getElementById('total-products-label').textContent = lang === 'TA' ? 'மொத்த பொருட்கள்' : 'Total Products';
+            document.getElementById('revenue-label').textContent = lang === 'TA' ? 'மாத வருவாய்' : 'Monthly Revenue';
+            document.getElementById('sales-rate-label').textContent = lang === 'TA' ? 'விற்பனை விகிதம்' : 'Sales Rate';
+            document.getElementById('orders-label').textContent = lang === 'TA' ? 'புதிய ஆர்டர்கள்' : 'New Orders';
+            
+            // Update table headers
+            document.getElementById('col-product').textContent = lang === 'TA' ? 'பொருள்' : 'Product';
+            document.getElementById('col-category').textContent = lang === 'TA' ? 'வகை' : 'Category';
+            document.getElementById('col-quantity').textContent = lang === 'TA' ? 'அளவு' : 'Quantity';
+            document.getElementById('col-price').textContent = lang === 'TA' ? 'விலை' : 'Price';
+            document.getElementById('col-status').textContent = lang === 'TA' ? 'நிலை' : 'Status';
+            document.getElementById('col-actions').textContent = lang === 'TA' ? 'செயல்கள்' : 'Actions';
+        }
+
+        // Add Product
+        function addProduct(e) {
+            e.preventDefault();
+            
+            const productName = document.getElementById('product-name').value;
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const price = parseInt(document.getElementById('price').value);
+            
+            if (!productName) {
+                showToast(currentLang === 'TA' ? 'தயவு செய்து பொருளின் பெயரை உள்ளிடவும்' : 'Please enter a product name', true);
+                return;
+            }
+            
+            // Show loading state
+            const submitBtn = document.querySelector('#product-form button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = currentLang === 'TA' ? 
+                '<i class="fas fa-spinner fa-spin"></i> சேமிக்கிறது...' : 
+                '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            
+            // Send to backend
+            fetch('/add_product', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: productName, quantity, price })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    showToast(currentLang === 'TA' ? 
+                        'பொருள் வெற்றிகரமாக சேர்க்கப்பட்டது!' : 
+                        'Product added successfully!');
+                    
+                    // Clear form
+                    productForm.reset();
+                    
+                    // Close modal
+                    addProductModal.style.display = 'none';
+                    
+                    // Refresh products
+                    fetchProducts();
+                }
+            })
+            .catch(error => {
+                console.error('Error adding product:', error);
+                showToast(currentLang === 'TA' ? 
+                    'பிழை: பொருளை சேர்க்க முடியவில்லை' : 
+                    'Error: Could not add product', true);
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = currentLang === 'TA' ? 
+                    '<i class="fas fa-save"></i> சேமிக்கவும்' : 
+                    '<i class="fas fa-save"></i> Save Product';
+            });
+        }
+
+        // Fetch Products
+        function fetchProducts() {
+            // Mock data for demonstration
+            products = [
+                { id: '1', name: 'தஞ்சாவூர் பிளேட்', category: 'Metalwork', quantity: 8, price: 1200 },
+                { id: '2', name: 'பட்டுப்புடவை', category: 'Textiles', quantity: 15, price: 3500 },
+                { id: '3', name: 'களிமண் விளக்கு', category: 'Pottery', quantity: 22, price: 450 },
+                { id: '4', name: 'வெண்கல சிற்பம்', category: 'Metalwork', quantity: 3, price: 7500 },
+                { id: '5', name: 'மரச் சிற்பம்', category: 'Woodwork', quantity: 12, price: 2800 },
+                { id: '6', name: 'பாரம்பரிய நகை', category: 'Jewelry', quantity: 7, price: 5200 }
+            ];
+            
+            renderInventory();
+            generateInsights();
+            updateStats();
+        }
+
+        // Update Stats
+        function updateStats() {
+            document.getElementById('total-products').textContent = products.length;
+            
+            // Calculate total revenue (dummy data for demo)
+            const revenue = products.reduce((sum, product) => sum + (product.price * product.quantity), 0);
+            document.getElementById('total-revenue').textContent = '₹' + revenue.toLocaleString();
+            
+            // Dummy values for other stats
+            document.getElementById('sales-rate').textContent = '87%';
+            document.getElementById('new-orders').textContent = '24';
+        }
+
+        // Render Inventory
+        function renderInventory() {
+            const tableBody = document.getElementById('inventory-body');
+            tableBody.innerHTML = '';
+            
+            if (products.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 2rem;">
+                            ${currentLang === 'TA' ? 
+                                'பொருட்கள் எதுவும் கிடைக்கவில்லை. புதிய பொருளைச் சேர்க்கவும்' : 
+                                'No products found. Add your first product!'}
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            products.forEach(product => {
+                // Determine stock status
+                let stockStatus = '';
+                let stockClass = '';
+                if (product.quantity < 5) {
+                    stockStatus = currentLang === 'TA' ? 'குறைவு' : 'Low';
+                    stockClass = 'stock-low';
+                } else if (product.quantity < 10) {
+                    stockStatus = currentLang === 'TA' ? 'சராசரி' : 'Medium';
+                    stockClass = 'stock-medium';
+                } else {
+                    stockStatus = currentLang === 'TA' ? 'போதுமானது' : 'Sufficient';
+                    stockClass = 'stock-high';
+                }
+                
+                // Get icon based on category
+                let icon = 'fa-box';
+                if (product.category.includes('Textile') || product.category.includes('Saree')) {
+                    icon = 'fa-tshirt';
+                } else if (product.category.includes('Clay') || product.category.includes('Pottery')) {
+                    icon = 'fa-mug-hot';
+                } else if (product.category.includes('Metal')) {
+                    icon = 'fa-gem';
+                } else if (product.category.includes('Jewelry')) {
+                    icon = 'fa-ring';
+                }
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        <div class="product-cell">
+                            <div class="product-img">
+                                <i class="fas ${icon}"></i>
+                            </div>
+                            <div class="product-info">
+                                <div class="product-name">${product.name}</div>
+                                <div class="product-category">${product.category}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${product.category}</td>
+                    <td>${product.quantity}</td>
+                    <td>₹${product.price}</td>
+                    <td>
+                        <span class="stock-badge ${stockClass}">${stockStatus}</span>
+                    </td>
+                    <td>
+                        <div class="action-cell">
+                            <div class="action-btn edit-btn">
+                                <i class="fas fa-edit"></i>
+                            </div>
+                            <div class="action-btn delete-btn" data-id="${product.id}">
+                                <i class="fas fa-trash"></i>
+                            </div>
+                        </div>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+            
+            // Add event listeners for delete buttons
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const productId = e.target.closest('.delete-btn').getAttribute('data-id');
+                    deleteProduct(productId);
+                });
+            });
+        }
+
+        // Delete Product
+        function deleteProduct(productId) {
+            if (confirm(currentLang === 'TA' ? 
+                `இந்தப் பொருளை நீக்க விரும்புகிறீர்களா?` : 
+                `Are you sure you want to delete this product?`)) {
+                
+                // Remove from products array
+                products = products.filter(p => p.id !== productId);
+                
+                showToast(currentLang === 'TA' ? 
+                    'பொருள் நீக்கப்பட்டது!' : 
+                    'Product deleted!');
+                fetchProducts();
+            }
+        }
+
+        // Generate AI Insights
+        function generateInsights() {
+            const insightsContainer = document.getElementById('insights-container');
+            insightsContainer.innerHTML = '';
+            
+            // Low stock insight
+            const lowStockProducts = products.filter(p => p.quantity < 5);
+            if (lowStockProducts.length > 0) {
+                const productNames = lowStockProducts.map(p => p.name).join(', ');
+                insightsContainer.innerHTML += `
+                    <div class="insight-card warning">
+                        <div class="insight-header">
+                            <div class="insight-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="insight-title">
+                                ${currentLang === 'TA' ? 'குறைந்த சரக்கு எச்சரிக்கை' : 'Low Stock Warning'}
+                            </div>
+                        </div>
+                        <div class="insight-content">
+                            ${currentLang === 'TA' ? 
+                                `${productNames} - இவற்றின் அளவு குறைவாக உள்ளது. உடனடியாக உற்பத்தி செய்ய பரிந்துரைக்கப்படுகிறது.` : 
+                                `${productNames} - are running low. Consider restocking immediately.`}
+                        </div>
+                        <div class="insight-actions">
+                            <button class="btn btn-outline">
+                                ${currentLang === 'TA' ? 'விவரங்கள்' : 'Details'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // High demand insight
+            const highDemandProducts = products.filter(p => p.quantity < 10 && p.price < 1000);
+            if (highDemandProducts.length > 0) {
+                const productNames = highDemandProducts.map(p => p.name).join(', ');
+                insightsContainer.innerHTML += `
+                    <div class="insight-card success">
+                        <div class="insight-header">
+                            <div class="insight-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="insight-title">
+                                ${currentLang === 'TA' ? 'அதிக தேவை உள்ள பொருள்' : 'High Demand Products'}
+                            </div>
+                        </div>
+                        <div class="insight-content">
+                            ${currentLang === 'TA' ? 
+                                `${productNames} - இவற்றிற்கு சமீபத்தில் அதிக தேவை உள்ளது. உற்பத்தியை அதிகரிக்கலாம்.` : 
+                                `${productNames} - have high recent demand. Consider increasing production.`}
+                        </div>
+                        <div class="insight-actions">
+                            <button class="btn btn-outline">
+                                ${currentLang === 'TA' ? 'பகுப்பாய்வு' : 'Analyze'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Pricing insight
+            const expensiveProducts = products.filter(p => p.price > 5000);
+            if (expensiveProducts.length > 0) {
+                const productNames = expensiveProducts.map(p => p.name).join(', ');
+                insightsContainer.innerHTML += `
+                    <div class="insight-card info">
+                        <div class="insight-header">
+                            <div class="insight-icon">
+                                <i class="fas fa-tags"></i>
+                            </div>
+                            <div class="insight-title">
+                                ${currentLang === 'TA' ? 'விலை சரிசெய்தல்' : 'Pricing Adjustment'}
+                            </div>
+                        </div>
+                        <div class="insight-content">
+                            ${currentLang === 'TA' ? 
+                                `${productNames} - இவற்றின் சராசரி சந்தை விலையுடன் ஒப்பிடும்போது உங்கள் விலை அதிகமாக உள்ளது.` : 
+                                `${productNames} - your pricing is higher compared to market average.`}
+                        </div>
+                        <div class="insight-actions">
+                            <button class="btn btn-outline">
+                                ${currentLang === 'TA' ? 'சரிசெய்' : 'Adjust'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Festival insight
+            insightsContainer.innerHTML += `
+                <div class="insight-card info">
+                    <div class="insight-header">
+                        <div class="insight-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="insight-title">
+                            ${currentLang === 'TA' ? 'திருவிழா தயாரிப்பு' : 'Festival Preparation'}
+                        </div>
+                    </div>
+                    <div class="insight-content">
+                        ${currentLang === 'TA' ? 
+                            'தீபாவளிக்கு 45 நாட்கள் மீதமுள்ளன. இந்த காலகட்டத்தில் பட்டுப் புடவைகள் மற்றும் களிமண் விளக்குகளுக்கு அதிக தேவை உள்ளது.' : 
+                            'Diwali is in 45 days. Sarees and terracotta lamps have high demand during this period.'}
+                    </div>
+                    <div class="insight-actions">
+                        <button class="btn btn-outline">
+                            ${currentLang === 'TA' ? 'திட்டமிடு' : 'Plan'}
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize Charts
+        function initializeCharts() {
+            // Sales Chart
+            const salesCtx = document.getElementById('salesChart').getContext('2d');
+            const salesChart = new Chart(salesCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                    datasets: [{
+                        label: currentLang === 'TA' ? 'மாத விற்பனை (₹)' : 'Monthly Sales (₹)',
+                        data: [85000, 102000, 98000, 115000, 124850, 110200, 132500],
+                        borderColor: '#8f94fb',
+                        backgroundColor: 'rgba(143, 148, 251, 0.1)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#ff7e5f',
+                        pointRadius: 5,
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + value.toLocaleString();
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Category Chart
+            const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+            const categoryChart = new Chart(categoryCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: currentLang === 'TA' ? 
+                        ['புடவைகள்', 'மட்பாண்டம்', 'உலோகக் கைவினை', 'நகைகள்', 'பிற'] : 
+                        ['Sarees', 'Pottery', 'Metal Craft', 'Jewelry', 'Others'],
+                    datasets: [{
+                        data: [35, 20, 25, 15, 5],
+                        backgroundColor: [
+                            '#4e54c8',
+                            '#ff7e5f',
+                            '#8f94fb',
+                            '#4caf50',
+                            '#ff9966'
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 15
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                boxWidth: 15,
+                                padding: 20
+                            }
+                        }
+                    },
+                    cutout: '65%'
+                }
+            });
+            
+            // Trend Chart (for Analysis section)
+            const trendCtx = document.getElementById('trendChart').getContext('2d');
+            const trendChart = new Chart(trendCtx, {
+                type: 'bar',
+                data: {
+                    labels: currentLang === 'TA' ? 
+                        ['ஜன', 'பிப்', 'மார்', 'ஏப்', 'மே', 'ஜூன்'] : 
+                        ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: currentLang === 'TA' ? 'விற்பனை வளர்ச்சி' : 'Sales Growth',
+                        data: [120, 150, 180, 90, 200, 240],
+                        backgroundColor: '#8f94fb',
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+            
+            // Revenue Chart (for Analysis section)
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            const revenueChart = new Chart(revenueCtx, {
+                type: 'pie',
+                data: {
+                    labels: currentLang === 'TA' ? 
+                        ['பட்டு', 'உலோகம்', 'மட்பாண்டம்', 'மரம்'] : 
+                        ['Silk', 'Metal', 'Pottery', 'Wood'],
+                    datasets: [{
+                        data: [40, 30, 20, 10],
+                        backgroundColor: [
+                            '#4e54c8',
+                            '#ff7e5f',
+                            '#8f94fb',
+                            '#4caf50'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        // Show Toast Notification
+        function showToast(message, isError = false) {
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = 'toast' + (isError ? ' error' : '');
+            toast.textContent = message;
+            
+            // Add to body
+            document.body.appendChild(toast);
+            
+            // Trigger reflow
+            void toast.offsetWidth;
+            
+            // Show toast
+            toast.classList.add('show');
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
